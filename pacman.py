@@ -12,13 +12,6 @@ from game.ghost import Ghost
 from game.pills import Pill, LargePill
 from game.fruit import Fruit
 
-# ---------------------------------------------------------------------
-# HEY!
-# ------
-# Scroll down for the first of this week's challenges!
-#
-# ---------------------------------------------------------------------
-
 
 class ScreenData:
     def __init__(self, screen_size):
@@ -123,24 +116,22 @@ class Pacman:
         
         self.ghosts_to_respawn = []
         self.ghosts = []
-        
-        # ----------------------------------------------------------------------
-        # Challenge 1
-        # --------------------
-        #
-        # Add more ghosts in different colours! You do this by creating Ghost
-        # objects with different starting parameters below.
-        # - There are different coloured ghost images in the images/ folder
-        # - remember to add the new ghosts to the self.ghosts list with append
-        #
-        # -------------------------------------------------------------
-        # Challenge 2 is found in the game/player python file!
-        # -----------------------------------------------------------------------
-        
+
         ghost_1 = Ghost((400, 275), 'images/green_ghost.png', self.level_number)
         self.ghosts.append(ghost_1)
 
-        self.wall_colour = pygame.Color(random.randint(100, 255), random.randint(100, 255), random.randint(100, 255))
+        ghost_2 = Ghost((400, 275), 'images/blue_ghost.png', self.level_number)
+        self.ghosts.append(ghost_2)
+
+        ghost_3 = Ghost((400, 275), 'images/red_ghost.png', self.level_number)
+        self.ghosts.append(ghost_3)
+
+        ghost_4 = Ghost((400, 275), 'images/purple_ghost.png', self.level_number)
+        self.ghosts.append(ghost_4)
+
+        self.wall_colour = pygame.Color(random.randint(100, 255),
+                                        random.randint(100, 255),
+                                        random.randint(100, 255))
         
         self.all_pill_sprites.empty()
         self.pills = []
@@ -169,7 +160,8 @@ class Pacman:
             time_delta = frame_time/1000.0
 
             if self.is_main_menu:
-                is_main_menu_and_index = self.main_menu.run(self.screen, self.background, self.fonts, self.screen_data)
+                is_main_menu_and_index = self.main_menu.run(self.screen, self.background,
+                                                            self.fonts, self.screen_data)
                 if is_main_menu_and_index[0] == 0:
                     self.is_main_menu = True
                     self.is_high_score_screen = False

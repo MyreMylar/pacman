@@ -2,11 +2,6 @@ import math
 import pygame
 from pygame.locals import *
 
-# ----------------------------------------------------------------------
-# Scroll down for Challenge 2 in the 'update_movement_and_collision'
-# function on line 121 - where we learn about collision.
-# ----------------------------------------------------------------------
-
 
 class Scheme:
     def __init__(self):
@@ -118,44 +113,14 @@ class Player(pygame.sprite.Sprite):
     def update_movement_and_collision(self, time_delta, maze_walls, maze_ghost_gate,
                                       pill_zones, ghosts, pills, fruits, player_stats):
 
-        # -----------------------------------------------------------------------
-        # CHALLENGE 2
-        # -------------
-        # Your task is to add another collision for loop that kills the player when he
-        # hits a ghost.
-        #
-        # A collision loop is just a way of checking if a bunch of
-        # objects of the same type are touching something. We step through each
-        # ghost, fruit or pill and check if it is colliding with the player and,
-        # if it is, do something appropriate.
-        #
-        # Tips:
-        # ------
-        # - Look at the two 'for' loops below for the yellow pills and the bonus fruits.
-        #   Your code will need to be similar.
-        #
-        # - The objects are all held in python lists. A list can be created like this in Python;
-        #   myList = [thingZeroInList, thingOneInList, thingTwoInList]
-        #
-        # - A for loop is the most commonly used loop in python and you will often see
-        #   it used like this ( e.g. for member in list ) to step through every member
-        #   of a list of things.
-        #
-        # - Set 'self.should_die' equal to True to kill the player.
-        # ------------------------------------------------------------------------
+        for ghost in ghosts:
+            if self.test_collision(ghost):
+                if ghost.is_vulnerable:
+                    ghost.should_die = True
+                    player_stats.score += 500
+                else:
+                    self.should_die = True
 
-        # -----------------------------------------------------------------------
-        # Bonus Challenge
-        # -----------------------------------------------------------------------
-        # To strike back at the ghosts in true pacman
-        # style you will need to test if the ghost.is_vulnerable
-        # variable is True during a collision.
-        #
-        # If it is, you should kill the ghost instead of Pacman.
-        #
-        # Don't forget to give yourself 500 points onto your score if you manage
-        # to kill a vulnerable ghost
-        # -----------------------------------------------------------------------
         for fruit in fruits:
             if self.test_collision(fruit):
                 fruit.should_die = True
