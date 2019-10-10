@@ -13,6 +13,14 @@ from game.pills import Pill, LargePill
 from game.fruit import Fruit
 
 
+# ---------------------------------------------------------------------
+# HEY!
+# ------
+# Scroll down for the first of this week's challenges!
+#
+# ---------------------------------------------------------------------
+
+
 class ScreenData:
     def __init__(self, screen_size):
         self.screen_size = screen_size
@@ -22,9 +30,9 @@ class Pacman:
     def __init__(self):
 
         # some colours
-        self.BLACK = (0,   0,   0)
-        self.RED = (255,   0,   0)
-        self.BLUE = (75,   75,   200)
+        self.BLACK = (0, 0, 0)
+        self.RED = (255, 0, 0)
+        self.BLUE = (75, 75, 200)
 
         # create empty pygame window with white background
         pygame.init()
@@ -34,11 +42,11 @@ class Pacman:
         self.screen = pygame.display.set_mode(self.screen_data.screen_size)
 
         pygame.key.set_repeat()
-        
+
         self.background = pygame.Surface(self.screen.get_size())
         self.background = self.background.convert(self.screen)
         self.background.fill((0, 0, 0))
-        
+
         self.all_pill_sprites = pygame.sprite.Group()
         self.all_sprites = pygame.sprite.Group()
         self.fonts = []
@@ -88,12 +96,12 @@ class Pacman:
         self.ghosts_to_respawn = []
 
         self.wall_colour = None
-        
+
         self.advance_to_next_level()
 
     # This function sets up a new level with a randomly generated maze and some ghostly enemies
     def advance_to_next_level(self):
-        
+
         del self.maze_walls[:]
         del self.maze_junctions[:]
         del self.pill_zones[:]
@@ -105,7 +113,7 @@ class Pacman:
         del self.ghosts[:]
 
         self.level_number += 1
-        
+
         # generate a maze
         maze_walls_pill_zones_and_junctions = create_maze(30, 30)
         self.maze_walls = maze_walls_pill_zones_and_junctions[0]
@@ -113,26 +121,28 @@ class Pacman:
         self.pill_zones = maze_walls_pill_zones_and_junctions[2]
         self.maze_base = maze_walls_pill_zones_and_junctions[3]
         self.maze_ghost_gate = maze_walls_pill_zones_and_junctions[4]
-        
+
         self.ghosts_to_respawn = []
         self.ghosts = []
+
+        # ----------------------------------------------------------------------
+        # Challenge 1
+        # --------------------
+        #
+        # Add more ghosts in different colours! You do this by creating Ghost
+        # objects with different starting parameters below.
+        # - There are different coloured ghost images in the images/ folder
+        # - remember to add the new ghosts to the self.ghosts list with append
+        #
+        # -------------------------------------------------------------
+        # Challenge 2 is found in the game/player python file!
+        # -----------------------------------------------------------------------
 
         ghost_1 = Ghost((400, 275), 'images/green_ghost.png', self.level_number)
         self.ghosts.append(ghost_1)
 
-        ghost_2 = Ghost((400, 275), 'images/blue_ghost.png', self.level_number)
-        self.ghosts.append(ghost_2)
+        self.wall_colour = pygame.Color(random.randint(100, 255), random.randint(100, 255), random.randint(100, 255))
 
-        ghost_3 = Ghost((400, 275), 'images/red_ghost.png', self.level_number)
-        self.ghosts.append(ghost_3)
-
-        ghost_4 = Ghost((400, 275), 'images/purple_ghost.png', self.level_number)
-        self.ghosts.append(ghost_4)
-
-        self.wall_colour = pygame.Color(random.randint(100, 255),
-                                        random.randint(100, 255),
-                                        random.randint(100, 255))
-        
         self.all_pill_sprites.empty()
         self.pills = []
         for zone in self.pill_zones:
@@ -154,14 +164,13 @@ class Pacman:
 
     def run_game(self):
         clock = pygame.time.Clock()
-        running = True  
+        running = True
         while running:
             frame_time = clock.tick(60)
-            time_delta = frame_time/1000.0
+            time_delta = frame_time / 1000.0
 
             if self.is_main_menu:
-                is_main_menu_and_index = self.main_menu.run(self.screen, self.background,
-                                                            self.fonts, self.screen_data)
+                is_main_menu_and_index = self.main_menu.run(self.screen, self.background, self.fonts, self.screen_data)
                 if is_main_menu_and_index[0] == 0:
                     self.is_main_menu = True
                     self.is_high_score_screen = False
@@ -211,11 +220,11 @@ class Pacman:
                     self.spawned_second_fruit_this_level = True
                     self.fruits.append(Fruit(self.level_number, self.all_pill_sprites,
                                              random.choice(self.start_locations)))
-                       
+
                 # handle UI and inout events
                 for event in pygame.event.get():
                     if event.type == QUIT:
-                        running = False    
+                        running = False
                     for player in self.players:
                         player.process_event(event)
 
@@ -228,7 +237,7 @@ class Pacman:
                     else:
                         respawning_player.update(frame_time)
                 self.players_to_respawn[:] = [r for r in self.players_to_respawn if not r.has_respawned]
-                
+
                 self.all_sprites.empty()
                 for ghost in self.ghosts:
                     ghost.update_movement_and_collision(time_delta, self.maze_junctions,
@@ -236,7 +245,7 @@ class Pacman:
                     self.all_sprites = ghost.update_sprite(self.all_sprites)
                     if ghost.is_in_base and ghost.is_dead:
                         ghost.respawn()
-                    
+
                 # update players and bullets
                 for player in self.players:
                     player.update_movement_and_collision(time_delta, self.maze_walls, self.maze_ghost_gate,
@@ -262,7 +271,7 @@ class Pacman:
                 self.fruits[:] = [fruit for fruit in self.fruits if not fruit.should_it_die(time_delta)]
 
                 self.all_sprites.update()
-                
+
                 self.screen.blit(self.background, (0, 0))  # draw the background
 
                 # draw maze
@@ -278,7 +287,7 @@ class Pacman:
                     self.advance_to_next_level()
 
                 for score in self.score_board:
-                    score_string = "Score:" 
+                    score_string = "Score:"
                     score_text_render = self.font.render(score_string, True,
                                                          pygame.Color("#FFFFFF"))
                     score_text_render_rect = score_text_render.get_rect(centerx=score.screen_position[0],
@@ -289,7 +298,7 @@ class Pacman:
                     self.screen.blit(score_text_render, score_text_render_rect)
                     self.screen.blit(score_text_render2, score_text_render_rect2)
 
-                    lives_string = "Lives:" 
+                    lives_string = "Lives:"
                     lives_text_render = self.font.render(lives_string, True, pygame.Color("#FFFFFF"))
                     lives_text_render_rect = score_text_render.get_rect(centerx=score.screen_position[0],
                                                                         centery=score.screen_position[1] + 96)
@@ -299,7 +308,7 @@ class Pacman:
                     self.screen.blit(lives_text_render, lives_text_render_rect)
                     self.screen.blit(lives_text_render2, lives_text_render_rect2)
 
-                    level_string = "Level:" 
+                    level_string = "Level:"
                     level_text_render = self.font.render(level_string, True, pygame.Color("#FFFFFF"))
                     level_text_render_rect = score_text_render.get_rect(centerx=score.screen_position[0],
                                                                         centery=score.screen_position[1] + 192)
@@ -314,10 +323,10 @@ class Pacman:
         pygame.quit()  # exited game loop so quit pygame
 
     def reset_game(self):
-          
+
         self.should_reset_game = False
         self.score_board = []
-        
+
         self.level_number = 0
         self.advance_to_next_level()
 
@@ -326,7 +335,7 @@ class Pacman:
 
         self.high_score_entry = HighScoreEntry(self.screen, self.screen_data, self.fonts, self.high_score_table)
 
-        
+
 def main():
     game = Pacman()
     game.run_game()

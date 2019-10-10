@@ -3,6 +3,12 @@ import pygame
 from pygame.locals import *
 
 
+# ----------------------------------------------------------------------
+# Scroll down for Challenge 2 in the 'update_movement_and_collision'
+# function on line 121 - where we learn about collision.
+# ----------------------------------------------------------------------
+
+
 class Scheme:
     def __init__(self):
         self.up = K_UP
@@ -13,7 +19,7 @@ class Scheme:
 
 class Player(pygame.sprite.Sprite):
     def __init__(self, start_pos, control_scheme, *groups):
-        
+
         super().__init__(*groups)
         self.scheme = control_scheme
         self.image_name = "images/player.png"
@@ -49,7 +55,7 @@ class Player(pygame.sprite.Sprite):
 
         self.last_vert_heading_vector = [0, 0]
         self.last_horiz_heading_vector = [0, 0]
-        
+
         self.should_vert_drift_to_next_centre = False
         self.should_horiz_drift_to_next_centre = False
 
@@ -60,7 +66,7 @@ class Player(pygame.sprite.Sprite):
         self.should_die = False
 
         self.move_accumulator = 0.0
-       
+
         self.position = [float(self.rect.center[0]), float(self.rect.center[1])]
 
         self.eat_pill_slowdown_time = 0.6
@@ -113,19 +119,49 @@ class Player(pygame.sprite.Sprite):
     def update_movement_and_collision(self, time_delta, maze_walls, maze_ghost_gate,
                                       pill_zones, ghosts, pills, fruits, player_stats):
 
-        for ghost in ghosts:
-            if self.test_collision(ghost):
-                if ghost.is_vulnerable:
-                    ghost.should_die = True
-                    player_stats.score += 500
-                else:
-                    self.should_die = True
+        # -----------------------------------------------------------------------
+        # CHALLENGE 2
+        # -------------
+        # Your task is to add another collision for loop that kills the player when he
+        # hits a ghost.
+        #
+        # A collision loop is just a way of checking if a bunch of
+        # objects of the same type are touching something. We step through each
+        # ghost, fruit or pill and check if it is colliding with the player and,
+        # if it is, do something appropriate.
+        #
+        # Tips:
+        # ------
+        # - Look at the two 'for' loops below for the yellow pills and the bonus fruits.
+        #   Your code will need to be similar.
+        #
+        # - The objects are all held in python lists. A list can be created like this in Python;
+        #   myList = [thingZeroInList, thingOneInList, thingTwoInList]
+        #
+        # - A for loop is the most commonly used loop in python and you will often see
+        #   it used like this ( e.g. for member in list ) to step through every member
+        #   of a list of things.
+        #
+        # - Set 'self.should_die' equal to True to kill the player.
+        # ------------------------------------------------------------------------
 
+        # -----------------------------------------------------------------------
+        # Bonus Challenge
+        # -----------------------------------------------------------------------
+        # To strike back at the ghosts in true pacman
+        # style you will need to test if the ghost.is_vulnerable
+        # variable is True during a collision.
+        #
+        # If it is, you should kill the ghost instead of Pacman.
+        #
+        # Don't forget to give yourself 500 points onto your score if you manage
+        # to kill a vulnerable ghost
+        # -----------------------------------------------------------------------
         for fruit in fruits:
             if self.test_collision(fruit):
                 fruit.should_die = True
                 player_stats.score += fruit.score
-                
+
         for pill in pills:
             if self.test_collision(pill):
                 pill.should_die = True
@@ -143,14 +179,14 @@ class Player(pygame.sprite.Sprite):
         else:
             self.speed = self.normal_speed
 
-        if self.should_move_up or self.should_move_down or self.should_move_left\
-                or self.should_move_right or self.should_horiz_drift_to_next_centre\
+        if self.should_move_up or self.should_move_down or self.should_move_left \
+                or self.should_move_right or self.should_horiz_drift_to_next_centre \
                 or self.should_vert_drift_to_next_centre:
-            
+
             last_move_horiz = False
             previous_pos = [self.position[0], self.position[1]]
             temp_rect = self.rect.copy()
-            
+
             if self.should_move_up and not self.should_horiz_drift_to_next_centre:
                 self.should_vert_drift_to_next_centre = False
                 if self.move_accumulator > 0.0:
@@ -222,7 +258,7 @@ class Player(pygame.sprite.Sprite):
             horiz_wall_line = [[0, 0], [0, 0]]
             collided_vert = False
             vert_wall_line = [[0, 0], [0, 0]]
-            
+
             for wall in maze_walls:
                 if self.test_wall_collision(temp_rect, wall):
                     wall.collided = True
@@ -230,12 +266,12 @@ class Player(pygame.sprite.Sprite):
                     self.should_horiz_drift_to_next_centre = False
                     if wall.is_horiz_wall:
                         collided_horiz = True
-                        
+
                         horiz_wall_line[0] = wall.start_pos
                         horiz_wall_line[1] = wall.end_pos
                     else:
                         collided_vert = True
-                        
+
                         vert_wall_line[0] = wall.start_pos
                         vert_wall_line[1] = wall.end_pos
 
@@ -244,7 +280,7 @@ class Player(pygame.sprite.Sprite):
                 self.should_vert_drift_to_next_centre = False
                 self.should_horiz_drift_to_next_centre = False
                 collided_horiz = True
-                
+
                 horiz_wall_line[0] = maze_ghost_gate.start_pos
                 horiz_wall_line[1] = maze_ghost_gate.end_pos
 
@@ -362,7 +398,7 @@ class Player(pygame.sprite.Sprite):
         smaller_rect.height = 28
         smaller_rect.center = original_center
         return smaller_rect
-    
+
     @staticmethod
     def distance_from_line(point, line):
 
@@ -373,10 +409,10 @@ class Player(pygame.sprite.Sprite):
         x3 = point[0]
         y3 = point[1]
 
-        px = x2-x1
-        py = y2-y1
+        px = x2 - x1
+        py = y2 - y1
 
-        something = px*px + py*py
+        something = px * px + py * py
 
         u = ((x3 - x1) * px + (y3 - y1) * py) / float(something)
 
@@ -397,7 +433,7 @@ class Player(pygame.sprite.Sprite):
         # can just return the squared distance instead
         # (i.e. remove the sqrt) to gain a little performance
 
-        dist = math.sqrt(dx*dx + dy*dy)
+        dist = math.sqrt(dx * dx + dy * dy)
 
         return dist
 
@@ -405,7 +441,7 @@ class Player(pygame.sprite.Sprite):
 class RespawnPlayer:
     def __init__(self, player):
         self.control_scheme = player.scheme
-        
+
         self.respawn_timer = 3.0
         self.time_to_spawn = False
         self.has_respawned = False
